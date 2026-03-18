@@ -25,6 +25,8 @@ private:
 	void CreateVertexBufferObjects();
 	void GetGLPosition(float x, float y, float *newX, float *newY);
 
+	void GenParticles(int n);
+
 	bool m_Initialized = false;
 	
 	unsigned int m_WindowSizeX = 0;
