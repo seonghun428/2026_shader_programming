@@ -17,6 +17,10 @@ public:
 	void DrawSolidRect(float x, float y, float z, float size, float r, float g, float b, float a);
 	void DrawTriangle();
 
+	void DrawRain();
+	
+	void FillWindow();
+	
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -37,5 +41,11 @@ private:
 
 	GLuint m_VBOTriangle = 0;
 	GLuint m_TriangleShader = 0;
+
+	GLuint m_SimpleShader = 0;
+	GLuint m_VBOTest = 0;
+
+	GLuint m_RainShader = 0;
+	GLuint m_VBORain = 0;
 };
 

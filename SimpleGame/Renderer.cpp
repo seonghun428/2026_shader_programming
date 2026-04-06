@@ -3,13 +3,14 @@
 
 #include <vector>
 
+float gTime = 0;
+
 int n_particles = 0;
 
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
 	Initialize(windowSizeX, windowSizeY);
 }
-
 
 Renderer::~Renderer()
 {}
@@ -21,13 +22,15 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_WindowSizeY = windowSizeY;
 
 	//Load shaders
-	m_SolidRectShader = CompileShaders("./Shaders/SolidRect.vs", "./Shaders/SolidRect.fs");
-	m_TriangleShader = CompileShaders("./Shaders/Triangle.vs", "./Shaders/Triangle.fs");
+	//m_SolidRectShader = CompileShaders("./Shaders/SolidRect.vs", "./Shaders/SolidRect.fs");
+	//m_TriangleShader = CompileShaders("./Shaders/Triangle.vs", "./Shaders/Triangle.fs");
+	m_SimpleShader = CompileShaders("./Shaders/Simple.vs", "./Shaders/Simple.fs");
+	//m_RainShader = CompileShaders("./Shaders/water.vs", "./Shaders/water.fs");
 
 	//Create VBOs
 	CreateVertexBufferObjects();
 
-	if (m_SolidRectShader > 0 && m_VBORect > 0)
+	if (m_SimpleShader > 0 && m_VBOTest > 0)
 	{
 		m_Initialized = true;
 	}
@@ -40,23 +43,23 @@ bool Renderer::IsInitialized()
 
 void Renderer::GenParticles(int n)
 {
-	srand((unsigned int)time(nullptr));
-
-	float velX = 1;
-	float velY = 1;
-	float size = 0.02;
-	float mass = 1;
-
-
-	float centerX = 0;
-	float centerY = 0;
-
 	std::vector<float> triangles;
-	triangles.reserve(n * 6 * 6);
+	triangles.reserve(n * 6 * 4);
 
 	for (int i = 0; i < n; i++)
 	{
 		float RV = (float)rand() / (float)RAND_MAX;
+		//float RV1 = (float)rand() / (float)RAND_MAX;
+		//float RV2 = (float)rand() / (float)RAND_MAX;
+
+		//float velX = (float)rand() / (float)RAND_MAX * 3.0 - 1.5;
+		//float velY = (float)rand() / (float)RAND_MAX * 3.0 - 1.5;
+
+		float size = 0.02;
+		float mass = 1;
+
+		float centerX = 0;
+		float centerY = 0;
 
 		float left = centerX - size / 2;
 		float right = centerX + size / 2;
@@ -65,38 +68,53 @@ void Renderer::GenParticles(int n)
 
 		// triangle 1
 		triangles.push_back(left); triangles.push_back(bottom); triangles.push_back(0.f); //Position
-		triangles.push_back(mass); //Mass
-		triangles.push_back(velX); triangles.push_back(velY); //Velocity
+		//triangles.push_back(mass); //Mass
+		//triangles.push_back(velX); triangles.push_back(velY); //Velocity
 		triangles.push_back(RV); //Random Value
+		//triangles.push_back(RV1); //Random Value 1
+		//triangles.push_back(RV2); //Random Value 2
 
 		triangles.push_back(right); triangles.push_back(bottom); triangles.push_back(0.f); //Position
-		triangles.push_back(mass); //Mass
-		triangles.push_back(velX); triangles.push_back(velY); //Velocity
+		//triangles.push_back(mass); //Mass
+		//triangles.push_back(velX); triangles.push_back(velY); //Velocity
 		triangles.push_back(RV); //Random Value
+		//triangles.push_back(RV1); //Random Value 1
+		//triangles.push_back(RV2); //Random Value 2
 
 		triangles.push_back(right); triangles.push_back(top); triangles.push_back(0.f); //Position
-		triangles.push_back(mass); //Mass
-		triangles.push_back(velX); triangles.push_back(velY); //Velocity
+		//triangles.push_back(mass); //Mass
+		//triangles.push_back(velX); triangles.push_back(velY); //Velocity
 		triangles.push_back(RV); //Random Value
+		//triangles.push_back(RV1); //Random Value 1
+		//triangles.push_back(RV2); //Random Value 2
 
 		// traingle 2
 		triangles.push_back(left); triangles.push_back(top); triangles.push_back(0.f); //Position
-		triangles.push_back(mass); //Mass
-		triangles.push_back(velX); triangles.push_back(velY); //Velocity
+		//triangles.push_back(mass); //Mass
+		//triangles.push_back(velX); triangles.push_back(velY); //Velocity
 		triangles.push_back(RV); //Random Value
+		//triangles.push_back(RV1); //Random Value 1
+		//triangles.push_back(RV2); //Random Value 2
 
 		triangles.push_back(left); triangles.push_back(bottom); triangles.push_back(0.f); //Position
-		triangles.push_back(mass); //Mass
-		triangles.push_back(velX); triangles.push_back(velY); //Velocity
+		//triangles.push_back(mass); //Mass
+		//triangles.push_back(velX); triangles.push_back(velY); //Velocity
 		triangles.push_back(RV); //Random Value
+		//triangles.push_back(RV1); //Random Value 1
+		//triangles.push_back(RV2); //Random Value 2
 
 		triangles.push_back(right); triangles.push_back(top); triangles.push_back(0.f); //Position
-		triangles.push_back(mass); //Mass
-		triangles.push_back(velX); triangles.push_back(velY); //Velocity
+		//triangles.push_back(mass); //Mass
+		//triangles.push_back(velX); triangles.push_back(velY); //Velocity
 		triangles.push_back(RV); //Random Value
+		//triangles.push_back(RV1); //Random Value 1
+		//triangles.push_back(RV2); //Random Value 2
 	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTriangle);
+	// glBindBuffer(GL_ARRAY_BUFFER, m_VBOTriangle);
+	// glBufferData(GL_ARRAY_BUFFER, sizeof(float) * triangles.size(), triangles.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBORain);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * triangles.size(), triangles.data(), GL_STATIC_DRAW);
 
 	n_particles = n;
@@ -111,13 +129,27 @@ void Renderer::CreateVertexBufferObjects()
 		-1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f,  1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, 1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f, //Triangle2
 	};
 
-	glGenBuffers(1, &m_VBORect);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+	//glGenBuffers(1, &m_VBORect);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &m_VBOTriangle);
+	// glGenBuffers(1, &m_VBOTriangle);
+	//glGenBuffers(1, &m_VBORain);
+	//GenParticles(1000);
 
-	GenParticles(30000000);
+	float simple_vertices[] = {
+		-1,	-1,	0,	0,	1,
+		-1,	 1, 0,	0,	0,
+		 1,	 1, 0,	1,	0,
+
+		-1, -1, 0,	0,	1,
+		 1,	 1, 0,	1,	0,
+		 1, -1, 0,	1,	1
+	};
+
+	glGenBuffers(1, &m_VBOTest);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTest);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(simple_vertices), simple_vertices, GL_STATIC_DRAW);
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -254,8 +286,6 @@ void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, flo
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-float gTime = 0;
-
 void Renderer::DrawTriangle()
 {
 	gTime += 0.001f;
@@ -278,12 +308,67 @@ void Renderer::DrawTriangle()
 	int attribRV = glGetAttribLocation(m_TriangleShader, "a_RV");
 	glEnableVertexAttribArray(attribRV);
 
+	int attribRV1 = glGetAttribLocation(m_TriangleShader, "a_RV1");
+	glEnableVertexAttribArray(attribRV1);
+
+	int attribRV2 = glGetAttribLocation(m_TriangleShader, "a_RV2");
+	glEnableVertexAttribArray(attribRV2);
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTriangle);
 
-	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, 0);
-	glVertexAttribPointer(attribMass, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLvoid*)(sizeof(float) * 3));
-	glVertexAttribPointer(attribVel, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLvoid*)(sizeof(float) * 4));
-	glVertexAttribPointer(attribRV, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (GLvoid*)(sizeof(float) * 6));
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glVertexAttribPointer(attribMass, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 3));
+	glVertexAttribPointer(attribVel, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 4));
+	glVertexAttribPointer(attribRV, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 6));
+	glVertexAttribPointer(attribRV1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 7));
+	glVertexAttribPointer(attribRV2, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (GLvoid*)(sizeof(float) * 8));
+
+	glDrawArrays(GL_TRIANGLES, 0, n_particles * 6);
+}
+
+void Renderer::FillWindow()
+{
+	gTime += 0.001f;
+
+	glUseProgram(m_SimpleShader);
+
+	int uTime = glGetUniformLocation(m_SimpleShader, "u_Time");
+	glUniform1f(uTime, gTime);
+
+	int attribPosition = glGetAttribLocation(m_SimpleShader, "a_Pos");
+	glEnableVertexAttribArray(attribPosition);
+
+	int attribUV = glGetAttribLocation(m_SimpleShader, "a_UV");
+	glEnableVertexAttribArray(attribUV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTest);
+
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	glVertexAttribPointer(attribUV, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Renderer::DrawRain()
+{
+	gTime += 0.001f;
+
+	//Program select
+	glUseProgram(m_RainShader);
+
+	int uTime = glGetUniformLocation(m_RainShader, "u_Time");
+	glUniform1f(uTime, gTime);
+
+	int attribPosition = glGetAttribLocation(m_RainShader, "a_Pos");
+	glEnableVertexAttribArray(attribPosition);
+
+	int attribRV = glGetAttribLocation(m_RainShader, "a_RV");
+	glEnableVertexAttribArray(attribRV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBORain);
+
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
+	glVertexAttribPointer(attribRV, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (GLvoid*)(sizeof(float) * 3));
 
 	glDrawArrays(GL_TRIANGLES, 0, n_particles * 6);
 }
